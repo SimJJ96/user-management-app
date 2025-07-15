@@ -482,3 +482,14 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+
+# Ignore environment-specific configs
+**/appsettings.Development.json
+**/appsettings.Local.json
+**/secrets.json
+
+
+# Entity Framework Core
+**/Migrations/*Snapshot.cs
+**/Migrations/*.Designer.cs
