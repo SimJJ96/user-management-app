@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using FluentValidation;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using UserManagement.API.DTOs;
 using UserManagement.Domain.Entities;
 using UserManagement.Infrastructure.Data;
 
@@ -11,68 +14,82 @@ namespace UserManagement.API.Controllers
     public class UsersController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly IMapper _mapper;
+        private readonly IValidator<CreateUserDto> _createUserValidator;
+        private readonly IValidator<UpdateUserDto> _updateUserValidator;
 
-        public UsersController(AppDbContext context)
+        public UsersController(
+            AppDbContext context,
+            IMapper mapper,
+            IValidator<CreateUserDto> createUserValidator,
+            IValidator<UpdateUserDto> updateUserValidator)
         {
             _context = context;
+            _mapper = mapper;
+            _createUserValidator = createUserValidator;
+            _updateUserValidator = updateUserValidator;
         }
+
 
         // GET: api/users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
         {
-            return await _context.Users.ToListAsync();
+            var users = await _context.Users.ToListAsync();
+            return Ok(_mapper.Map<IEnumerable<UserDto>>(users));
         }
 
-        // GET: api/users/5
+
+        // GET: api/users/id
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        public async Task<ActionResult<UserDto>> GetUser(int id)
         {
             var user = await _context.Users.FindAsync(id);
+            if (user == null) return NotFound();
 
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(user);
+            return Ok(_mapper.Map<UserDto>(user));
         }
 
         // POST: api/users
         [HttpPost]
-        public async Task<ActionResult<User>> CreateUser(User user)
+        public async Task<ActionResult<UserDto>> CreateUser(CreateUserDto dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            var validationResult = await _createUserValidator.ValidateAsync(dto);
+            if (!validationResult.IsValid)
+            {
+                foreach (var error in validationResult.Errors)
+                    ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
 
+                return ValidationProblem(ModelState);
+            }
+
+
+            var user = _mapper.Map<User>(dto);
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+            var result = _mapper.Map<UserDto>(user);
+            return CreatedAtAction(nameof(GetUser), new { id = result.Id }, result);
         }
 
         // PUT: api/users/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(int id, User user)
+        public async Task<IActionResult> UpdateUser(int id, UpdateUserDto dto)
         {
-            if (id != user.Id)
+            var validationResult = await _updateUserValidator.ValidateAsync(dto);
+            if (!validationResult.IsValid)
             {
-                return BadRequest("User ID mismatch.");
+                foreach (var error in validationResult.Errors)
+                    ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+
+                return ValidationProblem(ModelState);
             }
 
-            _context.Entry(user).State = EntityState.Modified;
+            var existingUser = await _context.Users.FindAsync(id);
+            if (existingUser == null) return NotFound();
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserExists(id))
-                    return NotFound();
-
-                throw;
-            }
+            _mapper.Map(dto, existingUser);
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
@@ -82,21 +99,12 @@ namespace UserManagement.API.Controllers
         public async Task<IActionResult> DeleteUser(int id)
         {
             var user = await _context.Users.FindAsync(id);
-
-            if (user == null)
-            {
-                return NotFound();
-            }
+            if (user == null) return NotFound();
 
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
-
-        private bool UserExists(int id)
-        {
-            return _context.Users.Any(e => e.Id == id);
         }
     }
 }
