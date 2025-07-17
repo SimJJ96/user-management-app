@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using UserManagement.Domain.Entities;
+using UserManagement.Domain.Interfaces;
 using UserManagement.Infrastructure.Data;
 
 namespace UserManagement.Infrastructure.Repositories
@@ -18,9 +14,9 @@ namespace UserManagement.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<User>> GetAllAsync()
+        public IQueryable<User> GetAll()
         {
-            return await _context.Users.ToListAsync();
+            return _context.Users.AsNoTracking();
         }
 
         public async Task<User?> GetByIdAsync(int id)
@@ -28,10 +24,11 @@ namespace UserManagement.Infrastructure.Repositories
             return await _context.Users.FindAsync(id);
         }
 
-        public async Task AddAsync(User user)
+        public async Task<User> AddAsync(User user)
         {
-            await _context.Users.AddAsync(user);
+            _context.Users.Add(user);
             await _context.SaveChangesAsync();
+            return user;
         }
 
         public async Task UpdateAsync(User user)

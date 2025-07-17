@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UserManagement.API.DTOs;
 using UserManagement.Domain.Entities;
+using UserManagement.Domain.Interfaces;
+using UserManagement.Domain.Services;
 using UserManagement.Infrastructure.Data;
 
 namespace UserManagement.API.Controllers
@@ -17,26 +19,37 @@ namespace UserManagement.API.Controllers
         private readonly IMapper _mapper;
         private readonly IValidator<CreateUserDto> _createUserValidator;
         private readonly IValidator<UpdateUserDto> _updateUserValidator;
+        private readonly IUserService _userService;
 
         public UsersController(
             AppDbContext context,
             IMapper mapper,
             IValidator<CreateUserDto> createUserValidator,
-            IValidator<UpdateUserDto> updateUserValidator)
+            IValidator<UpdateUserDto> updateUserValidator,
+            IUserService userService)
         {
             _context = context;
             _mapper = mapper;
             _createUserValidator = createUserValidator;
             _updateUserValidator = updateUserValidator;
+            _userService = userService;
         }
 
 
-        // GET: api/users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
+        public async Task<IActionResult> GetUsers([FromQuery] PageRequestDto request)
         {
-            var users = await _context.Users.ToListAsync();
-            return Ok(_mapper.Map<IEnumerable<UserDto>>(users));
+            var result = await _userService.GetUsersAsync(request.Search, request.SortBy, request.PageNumber, request.PageSize);
+
+            var response = new PageResponseDto<UserDto>
+            {
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize,
+                TotalRecords = result.TotalCount,
+                Data = result.Items.Select(u => _mapper.Map<UserDto>(u)).ToList()
+            };
+
+            return Ok(response);
         }
 
 
