@@ -21,13 +21,15 @@ namespace UserManagement.Domain.Services
             {
                 query = query.Where(u =>
                     u.FirstName.Contains(search) ||
+                    u.LastName.Contains(search) ||
                     u.Email.Contains(search));
             }
 
             query = sortBy?.ToLower() switch
             {
                 "email" => query.OrderBy(u => u.Email),
-                "name" => query.OrderBy(u => u.FirstName),
+                "firstName" => query.OrderBy(u => u.FirstName),
+                "lastName" => query.OrderBy(u => u.LastName),
                 _ => query.OrderBy(u => u.Id)
             };
 
