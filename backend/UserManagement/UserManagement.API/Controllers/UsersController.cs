@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UserManagement.API.DTOs;
+using UserManagement.Database.Data;
 using UserManagement.Domain.Entities;
 using UserManagement.Domain.Interfaces;
 using UserManagement.Domain.Services;
-using UserManagement.Infrastructure.Data;
 
 namespace UserManagement.API.Controllers
 {

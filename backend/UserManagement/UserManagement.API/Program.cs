@@ -1,15 +1,26 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using UserManagement.API.Mapping;
 using UserManagement.API.Validators;
+using UserManagement.Database.Data;
 using UserManagement.Domain.Interfaces;
 using UserManagement.Domain.Services;
-using UserManagement.Infrastructure.Data;
 using UserManagement.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Add CORS services and define policy
+// Add CORS services and define policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularDevClient", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200", "https://localhost:4200")  // Angular dev server URL
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -35,6 +46,16 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+if (args.Contains("migrate"))
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        db.Database.Migrate();
+        Console.WriteLine("Database migration completed.");
+    }
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -44,6 +65,8 @@ if (app.Environment.IsDevelopment())
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "User Management API v1");
     });
 }
+
+app.UseCors("AllowAngularDevClient");
 
 app.UseHttpsRedirection();
 
