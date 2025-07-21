@@ -40,6 +40,21 @@ docker-compose build
 docker-compose up
 ```
 
+🔁 Subsequent Runs:
+After the initial setup, you can remove the migrate command in docker-compose.yml in backend to avoid reapplying migrations on every startup.
+Update the command under the backend service to:
+
+#### Initial:
+```bash
+command: ["dotnet", "UserManagement.API.dll", "migrate"]
+```
+
+### Subsequent:
+```bash
+command: ["dotnet", "UserManagement.API.dll"]
+```
+This ensures normal API execution without attempting to run database migrations again.
+
 After the services start:
 - ✅ Visit the Angular frontend: http://localhost:4200
 - ✅ Test the API via Swagger: http://localhost:7020/swagger
