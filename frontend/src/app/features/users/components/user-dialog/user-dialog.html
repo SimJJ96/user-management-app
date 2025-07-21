@@ -1,0 +1,82 @@
+<h2 mat-dialog-title>
+  {{ isEditMode ? 'Edit User' : 'User Details' }}
+</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="form-group">
+    <mat-form-field appearance="fill" class="form-field">
+      <mat-label>First Name</mat-label>
+      <input matInput formControlName="firstName">
+      <mat-hint *ngIf="isEditMode">Enter your first name (1-50 characters)</mat-hint>
+      <mat-error *ngIf="form.get('firstName')?.hasError('required')">
+        First name is required
+      </mat-error>
+      <mat-error *ngIf="form.controls['firstName'].hasError('pattern')">
+        Invalid characters
+      </mat-error>
+      <mat-error *ngIf="form.controls['firstName'].hasError('maxlength')">
+        Max 50 characters
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="form-field">
+      <mat-label>Last Name</mat-label>
+      <input matInput formControlName="lastName">
+      <mat-hint *ngIf="isEditMode">Enter your last name (1-50 characters)</mat-hint>
+      <mat-error *ngIf="form.get('lastName')?.hasError('required')">
+        Last name is required
+      </mat-error>
+      <mat-error *ngIf="form.controls['lastName'].hasError('pattern')">
+        Invalid characters
+      </mat-error>
+      <mat-error *ngIf="form.controls['lastName'].hasError('maxlength')">
+        Max 50 characters
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="form-field">
+      <mat-label>Email</mat-label>
+      <input matInput formControlName="email" type="email">
+      <mat-error *ngIf="form.get('email')?.hasError('required')">
+        Email is required
+      </mat-error>
+      <mat-error *ngIf="form.get('email')?.hasError('email')">
+        Please enter a valid email
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Phone Number</mat-label>
+      <input matInput formControlName="phoneNumber">
+      <mat-hint *ngIf="isEditMode">Format: +6591234567</mat-hint>
+      <mat-error *ngIf="form.get('phoneNumber')?.hasError('pattern')">
+        Must be valid international format (e.g. +6591234567)
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Zip Code</mat-label>
+      <input matInput formControlName="zipCode">
+      <mat-hint *ngIf="isEditMode">3–10 alphanumeric characters</mat-hint>
+      <mat-error *ngIf="form.get('zipCode')?.hasError('pattern')">
+        Must be 3–10 alphanumeric characters
+      </mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="dialog-actions">
+  <button 
+    *ngIf="isEditMode" 
+    mat-raised-button 
+    color="primary" 
+    (click)="onSave()"
+    [disabled]="!form.valid"
+  >
+    Save
+  </button>  
+  <button mat-button (click)="onCancel()">
+    {{ isEditMode ? 'Cancel' : 'Close' }}
+  </button>
+
+</mat-dialog-actions>

@@ -1,0 +1,97 @@
+mat-card {
+  width: 700px;
+  border-radius: 0;
+  padding: 16px;
+  box-sizing: border-box;
+  margin:auto;
+
+  mat-card-title {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 8px;
+  }
+
+  mat-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+  }
+  
+  mat-card-actions {
+    justify-content: flex-end;
+    margin-top: 16px;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .value-box {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+  }
+
+  .dialog-card {
+    position: relative;
+    padding-top: 2rem; // space for the X button
+  }
+
+  .close-button {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    z-index: 10;
+    color: #555;
+  }
+
+  .full-width {
+    width: 100%;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+    gap: 1rem;
+  }
+
+  .optional-label {
+    font-weight: normal;
+    font-size: 0.85em;
+    color: #888;
+  }
+
+  .search-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+
+  .search-bar {
+    width: 100%;
+    max-width: 600px;
+  }
+
+  .full-width {
+  width: 100%;
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+  }
+
+  .user-form-card {
+    width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+}

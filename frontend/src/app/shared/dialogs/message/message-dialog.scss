@@ -1,0 +1,17 @@
+.dialog-title {
+  text-align: left;
+  padding-left: 16px;
+  font-size: 1.25rem;
+  font-weight: 500;
+  
+  span {
+    &.success { color: #4CAF50; }  // Material Green 500
+    &.error { color: #F44336; }    // Material Red 500
+    &.info { color: #2196F3; }     // Material Blue 500
+  }
+}
+
+.dialog-content {
+  text-align: center;
+  font-size: small;
+}
